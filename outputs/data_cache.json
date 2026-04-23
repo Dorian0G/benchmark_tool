@@ -1,0 +1,271 @@
+{
+  "last_checked": "2026-04-23T14:13:11.443896+00:00",
+  "companies": {
+    "con edison": {
+      "Revenue": {
+        "value": 16.6,
+        "year": "FY2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Renewable Energy %": {
+        "value": 70.0,
+        "year": "FY2025",
+        "source": "esg-scrape",
+        "updated": "2026-04-23"
+      },
+      "Outage Frequency": {
+        "value": 55.0,
+        "year": "2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Customer Satisfaction Score": {
+        "value": 52.0,
+        "year": "2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Carbon Emissions (MT CO2)": {
+        "value": 2.35,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Charitable Giving ($M)": {
+        "value": 8.5,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      }
+    },
+    "consolidated edison": {
+      "Revenue": {
+        "value": 16.6,
+        "year": "FY2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Renewable Energy %": {
+        "value": 70.0,
+        "year": "FY2025",
+        "source": "esg-scrape",
+        "updated": "2026-04-23"
+      },
+      "Outage Frequency": {
+        "value": 55.0,
+        "year": "2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Customer Satisfaction Score": {
+        "value": 52.0,
+        "year": "2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Carbon Emissions (MT CO2)": {
+        "value": 2.35,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Charitable Giving ($M)": {
+        "value": 8.5,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      }
+    },
+    "national grid": {
+      "Revenue": {
+        "value": 23.3,
+        "year": "FY2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Renewable Energy %": {
+        "value": 40.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Outage Frequency": {
+        "value": 58.0,
+        "year": "2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Customer Satisfaction Score": {
+        "value": 50.5,
+        "year": "2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Carbon Emissions (MT CO2)": {
+        "value": 3.4,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Charitable Giving ($M)": {
+        "value": 12.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      }
+    },
+    "pacific gas and electric": {
+      "Revenue": {
+        "value": 24.9,
+        "year": "FY2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Renewable Energy %": {
+        "value": 39.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Outage Frequency": {
+        "value": 136.0,
+        "year": "2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Customer Satisfaction Score": {
+        "value": 45.5,
+        "year": "2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Carbon Emissions (MT CO2)": {
+        "value": 5.1,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Charitable Giving ($M)": {
+        "value": 30.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      }
+    },
+    "duke energy": {
+      "Revenue": {
+        "value": 32.24,
+        "year": "FY2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Renewable Energy %": {
+        "value": 22.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Outage Frequency": {
+        "value": 90.0,
+        "year": "2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Customer Satisfaction Score": {
+        "value": 50.0,
+        "year": "2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Carbon Emissions (MT CO2)": {
+        "value": 58.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Charitable Giving ($M)": {
+        "value": 34.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      }
+    },
+    "eversource energy": {
+      "Revenue": {
+        "value": 13.1,
+        "year": "FY2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Renewable Energy %": {
+        "value": 31.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Outage Frequency": {
+        "value": 78.0,
+        "year": "2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Customer Satisfaction Score": {
+        "value": 51.0,
+        "year": "2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Carbon Emissions (MT CO2)": {
+        "value": 2.9,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Charitable Giving ($M)": {
+        "value": 6.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      }
+    },
+    "southern company": {
+      "Revenue": {
+        "value": 29.55,
+        "year": "FY2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Renewable Energy %": {
+        "value": 19.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Outage Frequency": {
+        "value": 95.0,
+        "year": "2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Customer Satisfaction Score": {
+        "value": 49.5,
+        "year": "2025",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Carbon Emissions (MT CO2)": {
+        "value": 65.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Charitable Giving ($M)": {
+        "value": 50.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      }
+    }
+  }
+}
