@@ -27,12 +27,13 @@ from modules.config import DEFAULT_COMPANIES, DEFAULT_METRICS, REPORT_YEAR
 from modules.input_handler import parse_input
 from modules.data_collector import collect_all
 from modules.ai_extractor import extract_metrics
-from modules.data_cleaner import build_raw_df, build_clean_df, fill_missing
+from modules.data_cleaner import build_raw_df, build_clean_df, fill_missing, compute_derived_metrics
 from modules.benchmark_engine import build_benchmark
 from modules.insight_generator import generate_rule_based_insights
 from modules.output_generator import generate_excel
 from modules.copilot_bridge import build_copilot_prompt
 from modules import data_cache as cache_module
+from modules import grantee_directory
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -153,6 +154,36 @@ METRIC_META = {
         "lower_is_better": False,
         "chart_note":     "↑ Higher = more community investment  (scale with company size)",
     },
+    "Foundation Assets ($M)": {
+        "unit":           "$M",
+        "unit_long":      "Millions of USD in foundation total assets / endowment",
+        "format":         lambda v: f"${v:.1f}M",
+        "axis_title":     "Foundation Assets ($M)",
+        "description":    "Total assets held by the corporate foundation at fiscal year-end (IRS Form 990 line: total assets). Indicates philanthropic capacity and runway.",
+        "expected_range": "Typically $5M – $100M for utility corporate foundations",
+        "lower_is_better": False,
+        "chart_note":     "↑ Higher = larger philanthropic endowment / greater capacity",
+    },
+    "Giving as % of Revenue": {
+        "unit":           "%",
+        "unit_long":      "Charitable giving expressed as % of company revenue",
+        "format":         lambda v: f"{v:.3f}%",
+        "axis_title":     "Giving as % of Revenue (%)",
+        "description":    "Computed: Charitable Giving ($M) ÷ (Revenue ($B) × 1000) × 100. Normalises philanthropy for company size — the fairest peer comparison.",
+        "expected_range": "Typically 0.05% – 0.30% for US utilities",
+        "lower_is_better": False,
+        "chart_note":     "↑ Higher = more giving per dollar of revenue (size-normalised)",
+    },
+    "Number of Grants Awarded": {
+        "unit":           "grants",
+        "unit_long":      "Count of grants awarded by the foundation in the fiscal year",
+        "format":         lambda v: f"{int(v):,}",
+        "axis_title":     "Number of Grants",
+        "description":    "Total grants paid by the foundation, counted from IRS Form 990-PF Part XV. Reflects breadth of grantmaking activity.",
+        "expected_range": "Typically 50 – 600 grants/year for utility foundations",
+        "lower_is_better": False,
+        "chart_note":     "↑ Higher = broader grantmaking footprint",
+    },
 }
 
 METRIC_DATA_YEAR: dict[str, str] = {
@@ -162,6 +193,9 @@ METRIC_DATA_YEAR: dict[str, str] = {
     "Customer Satisfaction Score":  "2025",
     "Carbon Emissions (MT CO2)":    "FY2024",
     "Charitable Giving ($M)":       "FY2024",
+    "Foundation Assets ($M)":       "FY2024",
+    "Giving as % of Revenue":       "FY2024",
+    "Number of Grants Awarded":     "FY2024",
 }
 
 
@@ -274,13 +308,20 @@ with st.sidebar:
     metrics_raw = st.text_area(
         "One metric per line",
         value="\n".join(DEFAULT_METRICS),
-        height=130,
+        height=180,
     )
+    with st.expander("➕ Optional philanthropy metrics"):
+        st.markdown(
+            "Add any of these to the box above to include them in the benchmark:\n\n"
+            "- **Foundation Assets ($M)** — total endowment from IRS 990\n"
+            "- **Number of Grants Awarded** — count from 990-PF Part XV"
+        )
 
     run_btn = st.button("🚀 Run Benchmark", use_container_width=True, type="primary")
     st.divider()
     st.markdown(
-        "**Data sources:** SEC EDGAR · ESG reports · IRS Form 990 · J.D. Power · Verified fallback\n\n"
+        "**Data sources:** SEC EDGAR · ESG reports · IRS Form 990 / 990-PF · "
+        "ProPublica Nonprofit Explorer · J.D. Power · Verified fallback\n\n"
         "**No API keys required.**"
     )
 
@@ -302,6 +343,15 @@ if run_btn:
     companies = [c for c in companies_raw.strip().splitlines() if c.strip()]
     metrics = [m for m in metrics_raw.strip().splitlines() if m.strip()]
 
+    # "Giving as % of Revenue" is computed from Revenue + Charitable Giving.
+    # Silently add the helpers if the user requested the ratio without them.
+    if any(m.strip().lower() == "giving as % of revenue" for m in metrics):
+        existing_lower = {m.strip().lower() for m in metrics}
+        if "revenue" not in existing_lower:
+            metrics.append("Revenue")
+        if "charitable giving ($m)" not in existing_lower:
+            metrics.append("Charitable Giving ($M)")
+
     try:
         request = parse_input(companies, metrics)
     except ValueError as e:
@@ -320,6 +370,7 @@ if run_btn:
 
     clean_df = build_clean_df(raw_df)
     filled_df = fill_missing(clean_df)
+    filled_df = compute_derived_metrics(filled_df)
 
     progress.progress(72, text="📊 Computing rankings…")
     bench_df = build_benchmark(filled_df)
@@ -332,9 +383,41 @@ if run_btn:
     progress.progress(87, text="💡 Generating insights…")
     insights = generate_rule_based_insights(bench_df)
 
+    # Attach Data Year to bench_df so the tool view and Excel export agree.
+    try:
+        _cache_for_year = cache_module.load()
+
+        def _row_year(row):
+            entry = cache_module.get_value(_cache_for_year, row["Company"], row["Metric"])
+            if entry and entry.get("year") and entry["year"] != "seed":
+                return entry["year"]
+            return METRIC_DATA_YEAR.get(row["Metric"], "FY2025")
+
+        bench_df["Data Year"] = bench_df.apply(_row_year, axis=1)
+    except Exception:
+        bench_df["Data Year"] = bench_df["Metric"].map(
+            lambda m: METRIC_DATA_YEAR.get(m, "FY2025")
+        )
+
+    # Fetch grantees once for the Grantee Directory tab + Excel sheet.
+    grantees_by_company: dict[str, list[dict]] = {}
+    for _company in request.companies:
+        try:
+            grantees_by_company[_company] = grantee_directory.fetch_grantees(_company)
+        except Exception as exc:
+            logger.warning("Grantee fetch failed for %s: %s", _company, exc)
+            grantees_by_company[_company] = []
+
     progress.progress(95, text="📦 Preparing Excel…")
     copilot_prompt = build_copilot_prompt(bench_df, request.companies, request.metrics)
-    excel_bytes = generate_excel(raw_df, clean_df, bench_df, insights, copilot_prompt=copilot_prompt)
+    excel_bytes = generate_excel(
+        raw_df,
+        filled_df,
+        bench_df,
+        insights,
+        copilot_prompt=copilot_prompt,
+        grantees_by_company=grantees_by_company,
+    )
     progress.progress(100, text="✅ Done!")
 
     st.session_state.bench_df = bench_df
@@ -344,6 +427,7 @@ if run_btn:
     st.session_state.copilot_prompt = copilot_prompt
     st.session_state.excel_bytes = excel_bytes
     st.session_state.request = request
+    st.session_state.grantees_by_company = grantees_by_company
 
 bench_df = st.session_state.bench_df
 raw_df = st.session_state.raw_df
@@ -354,8 +438,9 @@ excel_bytes = st.session_state.excel_bytes
 request = st.session_state.request
 
 # ── Tabs ───────────────────────────────────────────────────────────────────────
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-    "📊 Benchmark", "📈 Charts", "🧹 Clean Data", "📄 Raw Data", "💡 Insights", "🤖 Copilot"
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    "📊 Benchmark", "📈 Charts", "🧹 Clean Data", "📄 Raw Data",
+    "💡 Insights", "🤖 Copilot", "🤝 Grantee Directory",
 ])
 
 # ── Tab 1: Benchmark ───────────────────────────────────────────────────────────
@@ -376,24 +461,7 @@ with tab1:
                 )
     st.markdown('</div>', unsafe_allow_html=True)
 
-    display = bench_df[["Company", "Metric", "Value", "Rank", "Percentile"]].copy()
-
-    try:
-        _cache = cache_module.load()
-
-        def _get_year(row):
-            entry = cache_module.get_value(_cache, row["Company"], row["Metric"])
-            if entry and entry.get("year") and entry["year"] != "seed":
-                return entry["year"]
-            return METRIC_DATA_YEAR.get(row["Metric"], "FY2025")
-
-        display["Data Year"] = display.apply(_get_year, axis=1)
-    except Exception:
-        display["Data Year"] = display["Metric"].map(
-            lambda m: METRIC_DATA_YEAR.get(m, "FY2025")
-        )
-
-    display = display[["Company", "Metric", "Data Year", "Value", "Rank", "Percentile"]]
+    display = bench_df[["Company", "Metric", "Data Year", "Value", "Rank", "Percentile"]].copy()
     display["Value"] = display.apply(
         lambda row: _fmt(row["Metric"], row["Value"]) if pd.notna(row["Value"]) else "N/A",
         axis=1
@@ -432,7 +500,19 @@ with tab2:
         st.info(
             "💡 **Charitable Giving note:** Giving amounts correlate with company size and revenue. "
             "Larger integrated utilities (Duke, Southern) typically have larger foundation budgets than "
-            "smaller distributors. For a fairer comparison, consider giving as a % of revenue."
+            "smaller distributors. For a fairer comparison, see **Giving as % of Revenue**."
+        )
+    if "Giving as % of Revenue" in active_metrics:
+        st.info(
+            "📊 **Giving as % of Revenue:** computed from `Charitable Giving ($M) ÷ Revenue ($B) × 0.1`. "
+            "This is the size-normalised view ConEd's community partnerships team typically uses to "
+            "compare philanthropic intensity against peers."
+        )
+    if "Foundation Assets ($M)" in active_metrics:
+        st.info(
+            "🏛️ **Foundation Assets note:** Endowment / total assets from IRS Form 990. "
+            "Higher assets indicate philanthropic capacity and runway, but giving rate (grants paid / assets) "
+            "matters more for impact than headline asset size."
         )
 
 # ── Tab 3: Clean Data ──────────────────────────────────────────────────────────
@@ -495,6 +575,72 @@ with tab6:
 - *"Write a CEO briefing note on top and bottom performers"*
 - *"Compare charitable giving relative to company revenue"*
 """)
+
+# ── Tab 7: Grantee Directory ───────────────────────────────────────────────────
+with tab7:
+    st.subheader("Grantee Directory")
+    st.caption(
+        "Organizations each foundation has granted to. Sourced from IRS Form "
+        "990-PF Part XV (electronic filings) via ProPublica + IRS S3, with "
+        "verified-fallback data when live XML is unavailable. Each row "
+        "shows the filing year and provenance."
+    )
+
+    grantees_by_company = st.session_state.get("grantees_by_company", {})
+
+    selected_company = st.selectbox(
+        "Foundation",
+        options=request.companies,
+        index=0,
+        key="grantee_company_select",
+    )
+
+    grantees = grantees_by_company.get(selected_company, [])
+
+    if not grantees:
+        st.info(
+            f"No grantee data available for **{selected_company}**. "
+            "This usually means the foundation does not file a 990-PF "
+            "(public charities and corporate non-foundation giving aren't "
+            "captured here)."
+        )
+    else:
+        grantee_df = pd.DataFrame(grantees)
+        cols = [
+            c for c in ["grantee", "city", "state", "amount", "purpose", "year", "source"]
+            if c in grantee_df.columns
+        ]
+        grantee_df = grantee_df[cols].rename(columns={
+            "grantee": "Grantee",
+            "city":    "City",
+            "state":   "State",
+            "amount":  "Amount ($)",
+            "purpose": "Purpose",
+            "year":    "Year",
+            "source":  "Source",
+        })
+
+        grantee_df_display = grantee_df.copy()
+        if "Amount ($)" in grantee_df_display.columns:
+            grantee_df_display["Amount ($)"] = grantee_df_display["Amount ($)"].apply(
+                lambda v: f"${int(v):,}" if pd.notna(v) and v else "—"
+            )
+
+        total_amount = sum(g.get("amount", 0) or 0 for g in grantees)
+        sources = sorted({g.get("source", "") for g in grantees if g.get("source")})
+        col_a, col_b, col_c = st.columns(3)
+        col_a.metric("Grantees shown", f"{len(grantees):,}")
+        col_b.metric("Total granted (visible)", f"${total_amount:,}")
+        col_c.metric("Source", " · ".join(sources) or "—")
+
+        st.dataframe(grantee_df_display, use_container_width=True, hide_index=True)
+
+        st.caption(
+            "Lookup table only — grantees aren't ranked or scored. "
+            "For a benchmarkable metric, see **Number of Grants Awarded** "
+            "and **Charitable Giving ($M)**."
+        )
+
 
 # ── Download ───────────────────────────────────────────────────────────────────
 st.divider()

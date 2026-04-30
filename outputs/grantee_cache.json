@@ -1,0 +1,199 @@
+{
+  "foundations": {
+    "133573813": {
+      "grantees": [
+        {
+          "grantee": "City Harvest",
+          "city": "New York",
+          "state": "NY",
+          "amount": 75000,
+          "purpose": "Hunger relief",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "United Way of NYC",
+          "city": "New York",
+          "state": "NY",
+          "amount": 250000,
+          "purpose": "Community services",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "NY Botanical Garden",
+          "city": "Bronx",
+          "state": "NY",
+          "amount": 50000,
+          "purpose": "Environmental education",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "Brooklyn Public Library",
+          "city": "Brooklyn",
+          "state": "NY",
+          "amount": 35000,
+          "purpose": "STEM programs",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "Hispanic Federation",
+          "city": "New York",
+          "state": "NY",
+          "amount": 60000,
+          "purpose": "Workforce development",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        }
+      ],
+      "fetched": "2026-04-26T14:50:29",
+      "source": "verified-fallback"
+    },
+    "562064538": {
+      "grantees": [
+        {
+          "grantee": "United Way of Greater Charlotte",
+          "city": "Charlotte",
+          "state": "NC",
+          "amount": 500000,
+          "purpose": "Community services",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "Catawba Riverkeeper",
+          "city": "Charlotte",
+          "state": "NC",
+          "amount": 75000,
+          "purpose": "Watershed protection",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "NC State University",
+          "city": "Raleigh",
+          "state": "NC",
+          "amount": 250000,
+          "purpose": "Energy research",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "Florida State University Foundation",
+          "city": "Tallahassee",
+          "state": "FL",
+          "amount": 150000,
+          "purpose": "STEM scholarships",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "Cincinnati Children's Hospital",
+          "city": "Cincinnati",
+          "state": "OH",
+          "amount": 100000,
+          "purpose": "Pediatric healthcare",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        }
+      ],
+      "fetched": "2026-04-26T14:50:29",
+      "source": "verified-fallback"
+    },
+    "943234914": {
+      "grantees": [
+        {
+          "grantee": "California Wildlife Foundation",
+          "city": "Oakland",
+          "state": "CA",
+          "amount": 150000,
+          "purpose": "Wildfire recovery",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "Habitat for Humanity East Bay",
+          "city": "Oakland",
+          "state": "CA",
+          "amount": 100000,
+          "purpose": "Affordable housing",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "Second Harvest Silicon Valley",
+          "city": "San Jose",
+          "state": "CA",
+          "amount": 75000,
+          "purpose": "Hunger relief",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "Sacramento Tree Foundation",
+          "city": "Sacramento",
+          "state": "CA",
+          "amount": 60000,
+          "purpose": "Urban forestry",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "Latino Community Foundation",
+          "city": "San Francisco",
+          "state": "CA",
+          "amount": 90000,
+          "purpose": "Workforce development",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        }
+      ],
+      "fetched": "2026-04-26T14:51:03",
+      "source": "verified-fallback"
+    },
+    "364449474": {
+      "grantees": [
+        {
+          "grantee": "Boys & Girls Clubs of Boston",
+          "city": "Boston",
+          "state": "MA",
+          "amount": 100000,
+          "purpose": "Youth education",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "Buffalo Olmsted Parks",
+          "city": "Buffalo",
+          "state": "NY",
+          "amount": 50000,
+          "purpose": "Parks restoration",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "Long Island Cares",
+          "city": "Hauppauge",
+          "state": "NY",
+          "amount": 40000,
+          "purpose": "Food bank",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        },
+        {
+          "grantee": "Rhode Island Foundation",
+          "city": "Providence",
+          "state": "RI",
+          "amount": 80000,
+          "purpose": "Workforce development",
+          "year": "FY2024",
+          "source": "verified-fallback"
+        }
+      ],
+      "fetched": "2026-04-26T14:53:23",
+      "source": "verified-fallback"
+    }
+  }
+}

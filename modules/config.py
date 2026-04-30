@@ -36,6 +36,13 @@ DEFAULT_METRICS = [
     "Customer Satisfaction Score",
     "Carbon Emissions (MT CO2)",
     "Charitable Giving ($M)",
+    "Giving as % of Revenue",
+]
+
+# Optional philanthropy metrics — users can add these via the sidebar
+OPTIONAL_PHILANTHROPY_METRICS = [
+    "Foundation Assets ($M)",
+    "Number of Grants Awarded",
 ]
 
 METRIC_SYNONYMS: dict[str, list[str]] = {
@@ -64,6 +71,18 @@ METRIC_SYNONYMS: dict[str, list[str]] = {
         "philanthropy", "philanthropic", "community investment",
         "community giving", "foundation grants", "grants paid",
         "donations", "corporate giving", "social investment",
+    ],
+    "Foundation Assets ($M)": [
+        "foundation assets", "endowment", "total assets", "foundation endowment",
+        "net assets", "foundation net assets",
+    ],
+    "Giving as % of Revenue": [
+        "giving as % of revenue", "giving ratio", "philanthropic intensity",
+        "giving intensity", "charitable giving ratio",
+    ],
+    "Number of Grants Awarded": [
+        "number of grants", "grants awarded", "total grants", "grant count",
+        "number of awards",
     ],
 }
 

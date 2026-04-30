@@ -360,6 +360,33 @@ def _fetch_propublica_990(company: str) -> tuple[float, str, str] | None:
 
     API docs: https://projects.propublica.org/nonprofits/api
     """
+    full = _fetch_propublica_990_full(company)
+    if not full:
+        return None
+    grants_m = full.get("grants_paid_m")
+    year = full.get("year")
+    if grants_m is None or grants_m <= 0:
+        return None
+    return grants_m, year, "propublica-990"
+
+
+def _fetch_propublica_990_full(company: str) -> dict | None:
+    """
+    Pull the full ProPublica 990 filing payload for a foundation and return
+    grants paid, foundation total assets, grant count, and source filing
+    metadata (object_id / pdf_url). Returns None when no filing is available.
+
+    Uses the memoized fetcher in grantee_directory so the 3 callers
+    (grants paid, foundation assets, grant count) plus the XML grantee
+    lookup all share a single HTTP request per EIN per run.
+
+    Output dict keys (all optional except 'year'):
+      - grants_paid_m, foundation_assets_m, num_grants
+      - year                    e.g. "FY2023"
+      - filing_object_id        IRS XML object id, when ProPublica exposes it
+      - pdf_url                 link to the PDF filing (used for grantee fetch)
+      - foundation_name, ein
+    """
     foundation_info = COMPANY_FOUNDATIONS.get(company.lower().strip())
     if not foundation_info:
         return None
@@ -368,51 +395,98 @@ def _fetch_propublica_990(company: str) -> tuple[float, str, str] | None:
     if not ein:
         return None
 
-    # Try the specific organization endpoint first (most reliable)
-    url = f"https://projects.propublica.org/nonprofits/api/v2/organizations/{ein}.json"
-    r = _get(url, SCRAPE_HEADERS, timeout=15)
-    if not r:
+    from modules.grantee_directory import fetch_propublica_org
+    data = fetch_propublica_org(ein)
+    if not data:
         return None
 
     try:
-        data = r.json()
-        org = data.get("organization", {})
         filings = data.get("filings_with_data", [])
-
         if not filings:
             return None
 
-        # Get most recent filing
         latest = filings[0]
         tax_year = latest.get("tax_prd_yr")
+        year = f"FY{tax_year}" if tax_year else "FY?"
 
-        # Try totfuncexpns (total functional expenses) or totgftgrntspd
-        # (total grants/gifts paid) as a proxy for charitable giving
+        # Grants paid: prefer total grants/gifts paid, fall back to functional expenses
         grants = None
         for field in ["totgftgrntspd", "grsrcptspublcuse", "totfuncexpns"]:
             val = latest.get(field)
             if val and val > 0:
                 grants = val
                 break
-
         if not grants:
-            # Fall back to total revenue as an approximation for foundations
-            # whose primary purpose is grantmaking
             grants = latest.get("totrevenue")
 
-        if grants and grants > 0:
-            val_m = round(grants / 1e6, 2)
-            year = f"FY{tax_year}" if tax_year else "FY?"
-            logger.info(
-                "ProPublica 990 %s: $%.2fM grants (%s)",
-                foundation_info["foundation_name"], val_m, year,
-            )
-            return val_m, year, "propublica-990"
+        # Foundation total assets at end of year (balance sheet)
+        assets = None
+        for field in ["totassetsend", "totassets", "totassetsavg"]:
+            val = latest.get(field)
+            if val and val > 0:
+                assets = val
+                break
+
+        # ProPublica's API does not expose a direct grant count; we approximate
+        # by parsing the 990-PF XML in grantee_directory if available. For now,
+        # leave None and let the verified-fallback supply the count.
+        result = {
+            "ein": ein,
+            "foundation_name": foundation_info.get("foundation_name"),
+            "year": year,
+            "grants_paid_m": round(grants / 1e6, 2) if grants and grants > 0 else None,
+            "foundation_assets_m": round(assets / 1e6, 2) if assets and assets > 0 else None,
+            "num_grants": None,
+            "filing_object_id": latest.get("filing_id") or latest.get("schedule_b_filing_id"),
+            "pdf_url": latest.get("pdf_url"),
+        }
+        return result
 
     except Exception as e:
         logger.debug("ProPublica parse failed for %s: %s", company, e)
 
     return None
+
+
+def _fetch_foundation_assets(company: str) -> tuple[float, str, str] | None:
+    """Return (assets_in_millions, year, source) from ProPublica 990 data."""
+    full = _fetch_propublica_990_full(company)
+    if not full:
+        return None
+    assets_m = full.get("foundation_assets_m")
+    year = full.get("year")
+    if assets_m is None or assets_m <= 0:
+        return None
+    return assets_m, year, "propublica-990"
+
+
+def _fetch_num_grants(company: str) -> tuple[float, str, str] | None:
+    """
+    Count the number of grants awarded by parsing the live 990-PF XML.
+
+    Only returns a count when the grantees came from a real IRS filing —
+    the verified-fallback grantee list is a representative sample (≈5 rows
+    per foundation), so counting it would overwrite the cache's true
+    verified count (e.g. ConEd 150, Duke 600). When live XML is unavailable
+    we return None so the cache keeps its existing value.
+    """
+    try:
+        from modules import grantee_directory as gd
+        grantees = gd.fetch_grantees(company, max_grantees=10000)
+    except Exception as e:
+        logger.debug("Grantee directory unavailable for %s: %s", company, e)
+        return None
+
+    if not grantees:
+        return None
+
+    # Reject verified-fallback samples; they are not real counts
+    if any(g.get("source") == "verified-fallback" for g in grantees):
+        return None
+
+    full = _fetch_propublica_990_full(company)
+    year = (full or {}).get("year") or f"FY{datetime.now().year - 1}"
+    return float(len(grantees)), year, "990pf-xml"
 
 
 def _fetch_charitable_csr_scrape(company: str) -> tuple[float, str, str] | None:
@@ -538,6 +612,27 @@ def update_company(company: str, cache: dict) -> bool:
         if not cached or _is_newer(new_year, cached.get("year", "FY0")):
             cache_module.set_value(cache, company, "Charitable Giving ($M)", new_val, new_year, source)
             logger.info("Updated Charitable Giving for %s: $%.2fM (%s from %s)", company, new_val, new_year, source)
+            changed = True
+
+    # ── Foundation Assets ─────────────────────────────────────────────────────
+    result = _fetch_foundation_assets(company)
+    if result:
+        new_val, new_year, source = result
+        cached = cache_module.get_value(cache, company, "Foundation Assets ($M)")
+        if not cached or _is_newer(new_year, cached.get("year", "FY0")):
+            cache_module.set_value(cache, company, "Foundation Assets ($M)", new_val, new_year, source)
+            logger.info("Updated Foundation Assets for %s: $%.2fM (%s)", company, new_val, new_year)
+            changed = True
+
+    # ── Number of Grants Awarded ──────────────────────────────────────────────
+    # Parsed from 990-PF XML grantee list. Lazy-imported to avoid circular deps.
+    result = _fetch_num_grants(company)
+    if result:
+        new_val, new_year, source = result
+        cached = cache_module.get_value(cache, company, "Number of Grants Awarded")
+        if not cached or _is_newer(new_year, cached.get("year", "FY0")):
+            cache_module.set_value(cache, company, "Number of Grants Awarded", new_val, new_year, source)
+            logger.info("Updated Number of Grants for %s: %d (%s)", company, int(new_val), new_year)
             changed = True
 
     return changed

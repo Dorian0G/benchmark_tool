@@ -1,5 +1,5 @@
 {
-  "last_checked": "2026-04-23T14:13:11.443896+00:00",
+  "last_checked": "2026-04-28T19:12:47.715908+00:00",
   "companies": {
     "con edison": {
       "Revenue": {
@@ -12,7 +12,7 @@
         "value": 70.0,
         "year": "FY2025",
         "source": "esg-scrape",
-        "updated": "2026-04-23"
+        "updated": "2026-04-28"
       },
       "Outage Frequency": {
         "value": 55.0,
@@ -34,6 +34,18 @@
       },
       "Charitable Giving ($M)": {
         "value": 8.5,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Foundation Assets ($M)": {
+        "value": 50.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Number of Grants Awarded": {
+        "value": 150,
         "year": "FY2024",
         "source": "verified-fallback",
         "updated": "seed"
@@ -50,7 +62,7 @@
         "value": 70.0,
         "year": "FY2025",
         "source": "esg-scrape",
-        "updated": "2026-04-23"
+        "updated": "2026-04-28"
       },
       "Outage Frequency": {
         "value": 55.0,
@@ -72,6 +84,18 @@
       },
       "Charitable Giving ($M)": {
         "value": 8.5,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Foundation Assets ($M)": {
+        "value": 50.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Number of Grants Awarded": {
+        "value": 150,
         "year": "FY2024",
         "source": "verified-fallback",
         "updated": "seed"
@@ -113,6 +137,18 @@
         "year": "FY2024",
         "source": "verified-fallback",
         "updated": "seed"
+      },
+      "Foundation Assets ($M)": {
+        "value": 10.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Number of Grants Awarded": {
+        "value": 80,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
       }
     },
     "pacific gas and electric": {
@@ -148,6 +184,18 @@
       },
       "Charitable Giving ($M)": {
         "value": 30.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Foundation Assets ($M)": {
+        "value": 30.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Number of Grants Awarded": {
+        "value": 300,
         "year": "FY2024",
         "source": "verified-fallback",
         "updated": "seed"
@@ -189,6 +237,18 @@
         "year": "FY2024",
         "source": "verified-fallback",
         "updated": "seed"
+      },
+      "Foundation Assets ($M)": {
+        "value": 25.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Number of Grants Awarded": {
+        "value": 600,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
       }
     },
     "eversource energy": {
@@ -227,6 +287,18 @@
         "year": "FY2024",
         "source": "verified-fallback",
         "updated": "seed"
+      },
+      "Foundation Assets ($M)": {
+        "value": 8.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Number of Grants Awarded": {
+        "value": 100,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
       }
     },
     "southern company": {
@@ -262,6 +334,18 @@
       },
       "Charitable Giving ($M)": {
         "value": 50.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Foundation Assets ($M)": {
+        "value": 40.0,
+        "year": "FY2024",
+        "source": "verified-fallback",
+        "updated": "seed"
+      },
+      "Number of Grants Awarded": {
+        "value": 400,
         "year": "FY2024",
         "source": "verified-fallback",
         "updated": "seed"

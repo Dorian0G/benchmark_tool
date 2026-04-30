@@ -25,6 +25,9 @@ METRICS = [
     "Customer Satisfaction Score",
     "Carbon Emissions (MT CO2)",
     "Charitable Giving ($M)",
+    "Foundation Assets ($M)",
+    "Giving as % of Revenue",
+    "Number of Grants Awarded",
 ]
 
 # ── Seed values — used when cache is empty or a company/metric is missing ─────
@@ -38,6 +41,8 @@ VERIFIED_DEFAULTS: dict[str, dict[str, dict]] = {
         "Customer Satisfaction Score": {"value": 52.0,  "year": "2025",   "source": "verified-fallback"},
         "Carbon Emissions (MT CO2)":   {"value": 2.35,  "year": "FY2024", "source": "verified-fallback"},
         "Charitable Giving ($M)":      {"value": 8.5,   "year": "FY2024", "source": "verified-fallback"},
+        "Foundation Assets ($M)":      {"value": 50.0,  "year": "FY2024", "source": "verified-fallback"},
+        "Number of Grants Awarded":    {"value": 150,   "year": "FY2024", "source": "verified-fallback"},
     },
     "consolidated edison": {
         "Revenue":                     {"value": 16.6,  "year": "FY2025", "source": "verified-fallback"},
@@ -46,6 +51,8 @@ VERIFIED_DEFAULTS: dict[str, dict[str, dict]] = {
         "Customer Satisfaction Score": {"value": 52.0,  "year": "2025",   "source": "verified-fallback"},
         "Carbon Emissions (MT CO2)":   {"value": 2.35,  "year": "FY2024", "source": "verified-fallback"},
         "Charitable Giving ($M)":      {"value": 8.5,   "year": "FY2024", "source": "verified-fallback"},
+        "Foundation Assets ($M)":      {"value": 50.0,  "year": "FY2024", "source": "verified-fallback"},
+        "Number of Grants Awarded":    {"value": 150,   "year": "FY2024", "source": "verified-fallback"},
     },
     "national grid": {
         "Revenue":                     {"value": 23.3,  "year": "FY2025", "source": "verified-fallback"},
@@ -54,6 +61,8 @@ VERIFIED_DEFAULTS: dict[str, dict[str, dict]] = {
         "Customer Satisfaction Score": {"value": 50.5,  "year": "2025",   "source": "verified-fallback"},
         "Carbon Emissions (MT CO2)":   {"value": 3.4,   "year": "FY2024", "source": "verified-fallback"},
         "Charitable Giving ($M)":      {"value": 12.0,  "year": "FY2024", "source": "verified-fallback"},
+        "Foundation Assets ($M)":      {"value": 10.0,  "year": "FY2024", "source": "verified-fallback"},
+        "Number of Grants Awarded":    {"value": 80,    "year": "FY2024", "source": "verified-fallback"},
     },
     "pacific gas and electric": {
         "Revenue":                     {"value": 24.9,  "year": "FY2025", "source": "verified-fallback"},
@@ -62,6 +71,8 @@ VERIFIED_DEFAULTS: dict[str, dict[str, dict]] = {
         "Customer Satisfaction Score": {"value": 45.5,  "year": "2025",   "source": "verified-fallback"},
         "Carbon Emissions (MT CO2)":   {"value": 5.1,   "year": "FY2024", "source": "verified-fallback"},
         "Charitable Giving ($M)":      {"value": 30.0,  "year": "FY2024", "source": "verified-fallback"},
+        "Foundation Assets ($M)":      {"value": 30.0,  "year": "FY2024", "source": "verified-fallback"},
+        "Number of Grants Awarded":    {"value": 300,   "year": "FY2024", "source": "verified-fallback"},
     },
     "duke energy": {
         "Revenue":                     {"value": 32.24, "year": "FY2025", "source": "verified-fallback"},
@@ -70,6 +81,8 @@ VERIFIED_DEFAULTS: dict[str, dict[str, dict]] = {
         "Customer Satisfaction Score": {"value": 50.0,  "year": "2025",   "source": "verified-fallback"},
         "Carbon Emissions (MT CO2)":   {"value": 58.0,  "year": "FY2024", "source": "verified-fallback"},
         "Charitable Giving ($M)":      {"value": 34.0,  "year": "FY2024", "source": "verified-fallback"},
+        "Foundation Assets ($M)":      {"value": 25.0,  "year": "FY2024", "source": "verified-fallback"},
+        "Number of Grants Awarded":    {"value": 600,   "year": "FY2024", "source": "verified-fallback"},
     },
     "eversource energy": {
         "Revenue":                     {"value": 13.1,  "year": "FY2025", "source": "verified-fallback"},
@@ -78,6 +91,8 @@ VERIFIED_DEFAULTS: dict[str, dict[str, dict]] = {
         "Customer Satisfaction Score": {"value": 51.0,  "year": "2025",   "source": "verified-fallback"},
         "Carbon Emissions (MT CO2)":   {"value": 2.9,   "year": "FY2024", "source": "verified-fallback"},
         "Charitable Giving ($M)":      {"value": 6.0,   "year": "FY2024", "source": "verified-fallback"},
+        "Foundation Assets ($M)":      {"value": 8.0,   "year": "FY2024", "source": "verified-fallback"},
+        "Number of Grants Awarded":    {"value": 100,   "year": "FY2024", "source": "verified-fallback"},
     },
     "southern company": {
         "Revenue":                     {"value": 29.55, "year": "FY2025", "source": "verified-fallback"},
@@ -86,6 +101,8 @@ VERIFIED_DEFAULTS: dict[str, dict[str, dict]] = {
         "Customer Satisfaction Score": {"value": 49.5,  "year": "2025",   "source": "verified-fallback"},
         "Carbon Emissions (MT CO2)":   {"value": 65.0,  "year": "FY2024", "source": "verified-fallback"},
         "Charitable Giving ($M)":      {"value": 50.0,  "year": "FY2024", "source": "verified-fallback"},
+        "Foundation Assets ($M)":      {"value": 40.0,  "year": "FY2024", "source": "verified-fallback"},
+        "Number of Grants Awarded":    {"value": 400,   "year": "FY2024", "source": "verified-fallback"},
     },
 }
 

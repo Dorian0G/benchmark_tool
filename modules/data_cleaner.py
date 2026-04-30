@@ -21,6 +21,9 @@ _DIVISOR: dict[str, float] = {
     "customer satisfaction score": 10.0,
     "carbon emissions (mt co2)": 1_000_000,
     "charitable giving ($m)": 1_000_000,
+    "foundation assets ($m)": 1_000_000,
+    "number of grants awarded": 1.0,
+    "giving as % of revenue": 1.0,
 }
 
 _SCALE: dict[str, float] = {
@@ -109,3 +112,31 @@ def fill_missing(clean_df: pd.DataFrame) -> pd.DataFrame:
             logger.info("Column '%s' entirely missing — leaving as NaN.", col)
 
     return df
+
+
+def compute_derived_metrics(df: pd.DataFrame) -> pd.DataFrame:
+    """
+    Compute metrics that are derived from other metrics rather than scraped.
+
+    Currently:
+      - "Giving as % of Revenue" = Charitable Giving ($M) / (Revenue ($B) * 1000) * 100
+        Formula: giving_M / (revenue_B * 10) yields percent.
+        Example: $30M / $25B = 0.0012 = 0.12%
+    """
+    out = df.copy()
+
+    if "Giving as % of Revenue" in out.columns:
+        if "Charitable Giving ($M)" in out.columns and "Revenue" in out.columns:
+            giving = pd.to_numeric(out["Charitable Giving ($M)"], errors="coerce")
+            revenue = pd.to_numeric(out["Revenue"], errors="coerce")
+            # Avoid divide-by-zero — replace 0 revenue with NaN
+            ratio = giving / (revenue.where(revenue > 0) * 10.0)
+            out["Giving as % of Revenue"] = ratio.round(4)
+            logger.info("Computed 'Giving as % of Revenue' from Revenue + Charitable Giving")
+        else:
+            logger.warning(
+                "'Giving as %% of Revenue' requested but Revenue and/or "
+                "'Charitable Giving ($M)' missing from data — column left as-is."
+            )
+
+    return out

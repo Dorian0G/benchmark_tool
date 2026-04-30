@@ -68,6 +68,27 @@ PATTERNS: dict[str, list[re.Pattern]] = {
         # Fallback: any dollar amount near philanthropy keywords
         re.compile(r'(?:philanthrop|charit|foundation|community\s+invest)\D{0,60}?\$\s*(\d[\d,]*\.?\d*)\s*(million|billion)?', re.I),
     ],
+    "Foundation Assets ($M)": [
+        # "foundation assets of $50 million" / "endowment of $50 million"
+        re.compile(r'(?:foundation\s+(?:assets|endowment)|endowment|net\s+assets)\D{0,40}?\$\s*(\d[\d,]*\.?\d*)\s*(million|billion)?', re.I),
+        # "$50 million in foundation assets"
+        re.compile(r'\$\s*(\d[\d,]*\.?\d*)\s*(million|billion)\s+(?:in\s+)?(?:foundation\s+(?:assets|endowment)|endowment|net\s+assets)', re.I),
+        # "total assets ... $50 million" (990 language)
+        re.compile(r'total\s+assets\D{0,40}?\$\s*(\d[\d,]*\.?\d*)\s*(million|billion)?', re.I),
+    ],
+    "Number of Grants Awarded": [
+        # "150 grants awarded"
+        re.compile(r'(\d[\d,]*)\s+(?:grants?|awards?)\s+(?:awarded|paid|distributed|made)', re.I),
+        # "awarded 150 grants" / "made 150 grants"
+        re.compile(r'(?:awarded|paid|distributed|made)\s+(?:more\s+than\s+|over\s+)?(\d[\d,]*)\s+(?:grants?|awards?)', re.I),
+        # "number of grants: 150"
+        re.compile(r'number\s+of\s+grants?\D{0,20}?(\d[\d,]*)', re.I),
+    ],
+    "Giving as % of Revenue": [
+        # Computed metric — patterns rarely match, but support direct mentions
+        re.compile(r'(?:giving|philanthropy|charitable)\s+(?:as\s+)?(?:a\s+)?(?:%|percent|percentage)\s+of\s+revenue\D{0,30}?(\d[\d,]*\.?\d*)\s*(?:%|percent)?', re.I),
+        re.compile(r'(\d[\d,]*\.?\d*)\s*(?:%|percent)\s+of\s+revenue\s+(?:to|in)\s+(?:giving|philanthropy|charitable)', re.I),
+    ],
 }
 
 METRIC_SYNONYMS: dict[str, list[str]] = {
@@ -80,6 +101,18 @@ METRIC_SYNONYMS: dict[str, list[str]] = {
         "charitable giving", "charitable contributions", "foundation giving",
         "philanthropy", "community investment", "corporate giving",
         "grants paid", "foundation grants", "donations",
+    ],
+    "Foundation Assets ($M)":       [
+        "foundation assets", "endowment", "total assets", "net assets",
+        "foundation endowment",
+    ],
+    "Number of Grants Awarded":     [
+        "number of grants", "grants awarded", "total grants",
+        "grants paid", "grant count",
+    ],
+    "Giving as % of Revenue":       [
+        "giving as % of revenue", "giving ratio", "philanthropic intensity",
+        "charitable giving ratio",
     ],
 }
 

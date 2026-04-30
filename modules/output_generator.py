@@ -85,6 +85,7 @@ def generate_excel(
     bench_df: pd.DataFrame,
     insights: str = "",
     copilot_prompt: str = "",
+    grantees_by_company: dict[str, list[dict]] | None = None,
 ) -> bytes:
     wb = Workbook()
 
@@ -92,12 +93,44 @@ def generate_excel(
     ws1.title = "Raw Data"
     _write_df(ws1, raw_df)
 
+    # Cleaned Data sheet uses the post-fill, post-derived dataframe so it
+    # matches the "Clean Data" tab in the tool exactly (imputed values + the
+    # computed "Giving as % of Revenue" column).
     ws2 = wb.create_sheet("Cleaned Data")
     numeric_cols = [c for c in clean_df.columns if c != "Company"]
     _write_df(ws2, clean_df, number_cols=numeric_cols)
 
+    # Benchmark Summary mirrors the tool's "Benchmark" tab column order:
+    # Company | Metric | Data Year | Value | Rank | Industry Average | Percentile
+    bench_for_excel = bench_df.copy()
+    preferred = ["Company", "Metric", "Data Year", "Value", "Rank", "Industry Average", "Percentile"]
+    ordered = [c for c in preferred if c in bench_for_excel.columns]
+    extras = [c for c in bench_for_excel.columns if c not in ordered]
+    bench_for_excel = bench_for_excel[ordered + extras]
+
     ws3 = wb.create_sheet("Benchmark Summary")
-    _write_df(ws3, bench_df, number_cols=["Value", "Industry Average", "Percentile"])
+    _write_df(ws3, bench_for_excel, number_cols=["Value", "Industry Average", "Percentile"])
+
+    # Grantee Directory sheet — one row per grantee, prefixed with the company
+    # so all foundations live on a single sortable sheet.
+    if grantees_by_company:
+        rows: list[dict] = []
+        for company, grantees in grantees_by_company.items():
+            for g in grantees or []:
+                rows.append({
+                    "Company":    company,
+                    "Grantee":    g.get("grantee", ""),
+                    "City":       g.get("city", ""),
+                    "State":      g.get("state", ""),
+                    "Amount ($)": g.get("amount", 0) or 0,
+                    "Purpose":    g.get("purpose", ""),
+                    "Year":       g.get("year", ""),
+                    "Source":     g.get("source", ""),
+                })
+        if rows:
+            ws_gr = wb.create_sheet("Grantee Directory")
+            grantee_df = pd.DataFrame(rows)
+            _write_df(ws_gr, grantee_df, number_cols=["Amount ($)"])
 
     if insights:
         ws4 = wb.create_sheet("AI Insights")
